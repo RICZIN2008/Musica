@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reprodutor de Áudio</title>
+    <style>
+        body {
+            background: url('https://raw.githubusercontent.com/RICZIN2008/Playlist-404/refs/heads/main/tumblr_93404f23ebe1b818dcdbef705fc49d4d_012e84d3_500.gif') no-repeat center center fixed;
+            background-size: cover;
+            margin: 0;
+            padding: 0;
+        }
+        #playIcon {
+            width: 50px;
+            height: 50px;
+            background-color: #ffcc00;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            cursor: pointer;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            user-select: none;
+            z-index: 1000;
+        }
+        #musicWindow {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            right: 20px;
+            background-color: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            z-index: 999;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        #nowPlaying {
+            position: fixed;
+            bottom: 60px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+        .category {
+            margin-bottom: 15px;
+        }
+        .songButton {
+            display: block;
+            margin: 5px 0;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h2>Reprodutor de Áudio</h2>
+    
+    <div id="playIcon">▶</div>
+    <div id="musicWindow">
+        <h3>Escolha uma Categoria</h3>
+        
+        <div class="category" id="category1"></div>
+        <div class="category" id="category2"></div>
+        <div class="category" id="category3"></div>
+    </div>
+    
+    <div id="nowPlaying">Tocando: Nenhuma</div>
+
+    <script>
+        const playlist = [
+            { name: "MVP PT2", url: 'https://github.com/RICZIN2008/Playlist-404/raw/refs/heads/main/MVP%20PT2.mp3' },
+            { name: "Back in Black", url: 'https://github.com/RICZIN2008/Playlist-404/raw/refs/heads/main/back%20in%20black.mp3' },
+            { name: "Song 3", url: 'https://github.com/RICZIN2008/Playlist-404/raw/refs/heads/main/song3.mp3' },
+            { name: "Extra 1", url: 'https://github.com/RICZIN2008/Playlist-404/raw/refs/heads/main/extra1.mp3' },
+            { name: "Extra 2", url: 'https://github.com/RICZIN2008/Playlist-404/raw/refs/heads/main/extra2.mp3' },
+            { name: "Extra 3", url: 'https://github.com/RICZIN2008/Playlist-404/raw/refs/heads/main/extra3.mp3' },
+            { name: "Extra 4", url: 'https://github.com/RICZIN2008/Playlist-404/raw/refs/heads/main/extra4.mp3' },
+            { name: "Extra 5", url: 'https://github.com/RICZIN2008/Playlist-404/raw/refs/heads/main/extra5.mp3' },
+            { name: "Extra 6", url: 'https://github.com/RICZIN2008/Playlist-404/raw/refs/heads/main/extra6.mp3' }
+        ];
+
+        let currentAudio = null;
+        let currentIndex = -1;
+        let categories = ["category1", "category2", "category3"];
+
+        playlist.forEach((song, index) => {
+            let button = document.createElement("button");
+            button.className = "songButton";
+            button.setAttribute("data-index", index);
+            button.textContent = song.name;
+            button.addEventListener("click", () => playSong(index));
+            document.getElementById(categories[Math.floor(index / 3)]).appendChild(button);
+        });
+
+        function playSong(index) {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }
+            currentIndex = index;
+            currentAudio = new Audio(playlist[index].url);
+            currentAudio.play().catch(error => console.log("Erro ao reproduzir:", error));
+            document.getElementById('nowPlaying').textContent = `Tocando: ${playlist[index].name}`;
+            document.getElementById('nowPlaying').style.display = 'block';
+
+            currentAudio.addEventListener('ended', () => {
+                playNext();
+            });
+        }
+
+        function playNext() {
+            currentIndex++;
+            if (currentIndex < playlist.length) {
+                playSong(currentIndex);
+            } else {
+                document.getElementById('nowPlaying').textContent = 'Tocando: Nenhuma';
+                currentAudio = null;
+            }
+        }
+
+        document.getElementById("playIcon").addEventListener("click", function() {
+            let musicWindow = document.getElementById("musicWindow");
+            musicWindow.style.display = (musicWindow.style.display === "none" || musicWindow.style.display === "") ? "block" : "none";
+        });
+    </script>
+</body>
+</html>
