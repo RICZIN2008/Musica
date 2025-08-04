@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <title>TrapEmo Player</title>
+  <title>Music</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     /* ========== GLOBAL ========== */
@@ -41,7 +41,7 @@
       width: 240px;
       height: 100%;
       background: rgba(0, 0, 0, 0.9);
-      padding: 60px 16px 40px 16px; /* espaço de 60px para não ficar sob o ☰ */
+      padding: 60px 16px 40px 16px;
       transition: left 0.3s ease;
       box-shadow: 2px 0 6px #000;
       overflow-y: auto;
@@ -108,7 +108,7 @@
       border-radius: 50%;
       object-fit: cover;
       animation: spin 20s linear infinite;
-      animation-play-state: paused; /* começa parada */
+      animation-play-state: paused;
     }
     @keyframes spin {
       from {
@@ -130,17 +130,44 @@
     #controls {
       margin-top: 60px;
       display: flex;
+      justify-content: center;
       gap: 24px;
     }
     .btn {
       background: none;
-      border: none;
+      border: 2px solid #fff;
       color: #fff;
       font-size: 28px;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+      position: relative;
     }
     .btn:hover {
-      color: #1db954;
+      background-color: rgba(29, 185, 84, 0.3);
+      transform: scale(1.1);
+    }
+    .btn:active {
+      transform: scale(0.95);
+    }
+    .btn:focus {
+      outline: none;
+      box-shadow: 0 0 10px rgba(29, 185, 84, 0.7);
+    }
+
+    #playPauseBtn {
+      font-size: 32px;
+    }
+    #repeatBtn, #shuffleBtn {
+      font-size: 30px;
+    }
+    #prevBtn, #nextBtn {
+      font-size: 32px;
     }
   </style>
 </head>
@@ -151,18 +178,29 @@
   <!-- SIDE MENU -->
   <nav id="sideMenu">
     <h3>TrapEmo</h3>
-
-    <!-- Dropo -->
     <h4>Dropo</h4>
-    <button class="trackBtn" data-artist="0" data-track="0">Como eu me sinto</button>
-    <button class="trackBtn" data-artist="0" data-track="1">Fumando Gás</button>
+    <button class="trackBtn" data-artist="0" data-track="1">Como eu me sinto</button>
+    <button class="trackBtn" data-artist="0" data-track="2">Fumando Gás</button>
     <button class="trackBtn" data-artist="0" data-track="3">MOKDA</button>
     <button class="trackBtn" data-artist="0" data-track="4">Não Volto Mais</button>
+    <button class="trackBtn" data-artist="0" data-track="0">titulo</button>
+    <button class="trackBtn" data-artist="0" data-track="0">titulo</button>
+    <button class="trackBtn" data-artist="0" data-track="0">titulo</button>
+    <button class="trackBtn" data-artist="0" data-track="0">titulo</button>
+    <button class="trackBtn" data-artist="0" data-track="0">titulo</button>
+    <button class="trackBtn" data-artist="0" data-track="0">titulo</button>
+    <button class="trackBtn" data-artist="0" data-track="0">titulo</button>    
     
-    <!-- Lil giela -->
     <h4>Lil giela</h4>
-    <button class="trackBtn" data-artist="1" data-track="0">TXT 1</button>
-    <button class="trackBtn" data-artist="1" data-track="1">TXT 2</button>
+    <button class="trackBtn" data-artist="1" data-track="0">titulo</button>
+    <button class="trackBtn" data-artist="1" data-track="0">titulo</button>
+    <button class="trackBtn" data-artist="1" data-track="0">titulo</button>
+    <button class="trackBtn" data-artist="1" data-track="0">titulo</button>
+    <button class="trackBtn" data-artist="1" data-track="0">titulo</button>
+    <button class="trackBtn" data-artist="1" data-track="0">titulo</button>
+    <button class="trackBtn" data-artist="1" data-track="0">titulo</button>
+    <button class="trackBtn" data-artist="1" data-track="0">titulo</button>
+    <button class="trackBtn" data-artist="1" data-track="0">titulo</button>    
   </nav>
 
   <!-- PLAYER CIRCLE -->
@@ -171,7 +209,6 @@
       <circle id="progressBg" cx="50" cy="50" r="44" />
       <circle id="progress" cx="50" cy="50" r="44" />
     </svg>
-    <!-- Foto principal inicial -->
     <img id="cover" src="default.jpg" alt="capa" />
     <div id="timeLeft">00:00</div>
   </div>
@@ -181,66 +218,52 @@
     <button class="btn" id="prevBtn">⏮️</button>
     <button class="btn" id="playPauseBtn">⏯️</button>
     <button class="btn" id="nextBtn">⏭️</button>
-    <button class="btn" id="repeatBtn">🔁</button>
-    <button class="btn" id="shuffleBtn">🔀</button>
+    <button class="btn" id="repeatBtn" title="Repeat">🔁</button>
+    <button class="btn" id="shuffleBtn" title="Shuffle">🔀</button>
   </div>
 
   <audio id="player"></audio>
 
   <script>
-    /************ ARTISTAS & PLAYLISTS ************/
     const artists = [
       {
         name: "Dropo",
-        cover: "https://raw.githubusercontent.com/RICZIN2008/Dropo/refs/heads/main/Dropo.jpg", // foto única para todas as faixas de Dropo
+        cover: "https://raw.githubusercontent.com/RICZIN2008/Dropo/refs/heads/main/Dropo.jpg",
         tracks: [
-          {
-            src:
-              "https://github.com/RICZIN2008/Dropo/raw/refs/heads/main/1.mp3",
-            title: "Como eu me sinto",
-          },
-          {
-            src:
-              "https://github.com/RICZIN2008/Dropo/raw/refs/heads/main/2.mp3",
-            title: "Fumando Gás",
-          },
-          {
-            src:
-              "https://github.com/RICZIN2008/Dropo/raw/refs/heads/main/3.mp3",
-            title: "MOKDA",
-          },
-          {
-            src:
-              "https://github.com/RICZIN2008/Dropo/raw/refs/heads/main/3.mp3",
-            title: "Não Volto Mais",            
-          },
+          { src: "https://github.com/RICZIN2008/Dropo/raw/refs/heads/main/1.mp3", title: "Como eu me sinto" },
+          { src: "https://github.com/RICZIN2008/Dropo/raw/refs/heads/main/2.mp3", title: "Fumando Gás" },
+          { src: "https://github.com/RICZIN2008/Dropo/raw/refs/heads/main/3.mp3", title: "MOKDA" },
+          { src: "https://github.com/RICZIN2008/Dropo/raw/refs/heads/main/4.mp3", title: "Não Volto Mais" },
+          { src: "https://github.com/RICZIN2008/Dropo/raw/refs/heads/main/5.mp3", title: "titulo" },
+          { src: "linkkkk", title: "titulo" },
+          { src: "linkkkk", title: "titulo" },
+          { src: "linkkkk", title: "titulo" },
+          { src: "linkkkk", title: "titulo" },
+          { src: "linkkkk", title: "titulo" },
+          { src: "linkkkk", title: "titulo" },
         ],
       },
       {
         name: "Lil giela",
-        cover: "coverGiela.jpg", // foto única para Lil giela
+        cover: "coverGiela.jpg",
         tracks: [
-          {
-            src:
-              "https://raw.githubusercontent.com/SEU_USUARIO/NOME_REPO/main/Giela-TXT1.mp3",
-            title: "TXT 1",
-          },
-          {
-            src:
-              "https://raw.githubusercontent.com/SEU_USUARIO/NOME_REPO/main/Giela-TXT2.mp3",
-            title: "TXT 2",
-          },
+          { src: "linkkkk", title: "titulo" },
+          { src: "linkkkk", title: "titulo" },
+          { src: "linkkkk", title: "titulo" },
+          { src: "linkkkk", title: "titulo" },
+          { src: "linkkkk", title: "titulo" },
+          { src: "linkkkk", title: "titulo" },
+          { src: "linkkkk", title: "titulo" },
+          { src: "linkkkk", title: "titulo" },
+          { src: "linkkkk", title: "titulo" },
         ],
       },
     ];
 
-    /************ ESTADO ************/
-    let currentArtistIndex = null; // qual artista está tocando
-    let currentTrackIndex = null; // índice da faixa dentro do artista
-    let repeat = false,
-      shuffle = false;
+    let currentArtistIndex = null;
+    let currentTrackIndex = null;
+    let repeat = false, shuffle = false;
 
-    /************ ELEMENTOS DOM ************/
     const player = document.getElementById("player");
     const progress = document.getElementById("progress");
     const cover = document.getElementById("cover");
@@ -258,11 +281,8 @@
     const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
     progress.style.strokeDasharray = CIRCUMFERENCE;
 
-    /************ FUNÇÕES AUX ************/
     const fmt = (t) =>
-      `${String(Math.floor(t / 60)).padStart(2, "0")}:${String(
-        Math.floor(t % 60)
-      ).padStart(2, "0")}`;
+      `${String(Math.floor(t / 60)).padStart(2, "0")}:${String(Math.floor(t % 60)).padStart(2, "0")}`;
 
     function loadTrack(aIdx, tIdx) {
       currentArtistIndex = aIdx;
@@ -270,16 +290,15 @@
       const artist = artists[aIdx];
       const track = artist.tracks[tIdx];
       player.src = track.src;
-      cover.src = artist.cover; // foto única do artista
+      cover.src = artist.cover;
       player.load();
       player.play();
       cover.style.animationPlayState = "running";
       playPauseBtn.textContent = "⏸️";
-      // sideMenu.classList.remove('open'); // comentado para NÃO fechar o menu
     }
 
     function nextTrack() {
-      if (currentArtistIndex === null) return; // nada tocando
+      if (currentArtistIndex === null) return;
       const artist = artists[currentArtistIndex];
       if (shuffle) {
         currentTrackIndex = Math.floor(Math.random() * artist.tracks.length);
@@ -289,7 +308,6 @@
         currentTrackIndex++;
         loadTrack(currentArtistIndex, currentTrackIndex);
       } else {
-        // acabou todas as faixas do artista → parar
         player.pause();
         playPauseBtn.textContent = "⏯️";
         cover.style.animationPlayState = "paused";
@@ -309,7 +327,6 @@
       }
     }
 
-    /************ EVENTOS PLAYER ************/
     player.addEventListener("ended", () => {
       if (repeat) {
         player.currentTime = 0;
@@ -326,7 +343,6 @@
       timeLeft.textContent = fmt(Math.max(0, player.duration - player.currentTime));
     });
 
-    /************ EVENTOS UI ************/
     playPauseBtn.addEventListener("click", () => {
       if (player.paused) {
         player.play();
@@ -345,7 +361,9 @@
     repeatBtn.addEventListener("click", () => {
       repeat = !repeat;
       repeatBtn.style.color = repeat ? "#1db954" : "#fff";
+      repeatBtn.textContent = repeat ? "🔂" : "🔁";
     });
+
     shuffleBtn.addEventListener("click", () => {
       shuffle = !shuffle;
       shuffleBtn.style.color = shuffle ? "#1db954" : "#fff";
@@ -364,9 +382,7 @@
         loadTrack(aIdx, tIdx);
       })
     );
-
-    // foto principal já está definida como default.jpg no HTML
   </script>
 </body>
-    </html>
-    
+      </html>
+      
